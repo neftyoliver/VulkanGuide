@@ -104,7 +104,7 @@ namespace vkhelp {
         return avgDeviceProperties;
     }
 
-    int VulkanHelper::addLayer(const char * paramLayerName)
+    VkHelperResult VulkanHelper::addLayer(const char * paramLayerName)
     {
         
 
@@ -117,15 +117,15 @@ namespace vkhelp {
 
                 std::cout << "Adding layer: " << paramLayerName << std::endl;
 
-                return 0;
+                return vkhelp::VkHelperResult::SUCCESS;
             }
         }
 
         std::cout << "Skip adding layer which is unvailable: " << paramLayerName << std::endl;
-        return -1;
+        return vkhelp::VkHelperResult::LAYER_UNEXIST;
     }
 
-    int VulkanHelper::addExtension(const char* paramExtensionName)
+    VkHelperResult VulkanHelper::addExtension(const char* paramExtensionName)
     {
         for(auto extension : vecAvailableExtensions)
         {
@@ -135,12 +135,12 @@ namespace vkhelp {
 
                 std::cout << "Adding extension: " << paramExtensionName << std::endl;
 
-                return 0;
+                return vkhelp::VkHelperResult::SUCCESS;
             }
         }
 
         std::cout << "Skip adding extension which is unvailable: " << paramExtensionName << std::endl;
-        return -1;
+        return vkhelp::VkHelperResult::EXTENSION_UNEXIST;
     }
 
     VulkanHelper::VulkanHelper(const char* programName)
@@ -200,13 +200,13 @@ namespace vkhelp {
         return this->vecPhysicalDevices;
     }
 
-    int VulkanHelper::selectPhysicalDevice(uint32_t index)
+    VkHelperResult VulkanHelper::selectPhysicalDevice(uint32_t index)
     {
 
 
         if (this->vecPhysicalDevices.size() <= index)
         {
-            return -1;
+            return vkhelp::VkHelperResult::OUT_OF_INDEX_BOUND;
         }
 
         this->selectedDevice = this->vecPhysicalDevices[index];
@@ -215,7 +215,7 @@ namespace vkhelp {
         std::cout << "Device selected: " << this->selectedDevice.getProperties().deviceName << std::endl;
 #endif
 
-        return 0;
+        return vkhelp::VkHelperResult::SUCCESS;
     }
 
     vk::PhysicalDevice VulkanHelper::getSelectedPhysicalDevice()

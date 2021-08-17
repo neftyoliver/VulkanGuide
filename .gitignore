@@ -447,3 +447,8 @@ FodyWeavers.xsd
 # End of https://www.toptal.com/developers/gitignore/api/c++,visualstudio,cmake
 FirstProgram/._main.c
 FirstProgram/._makefile
+SecondProgram/build/
+ThirdProgram/build/
+ForthProgram/build/
+FirstProgram/build/main.vcxproj
+FirstProgram/build/

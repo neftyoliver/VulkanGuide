@@ -14,8 +14,6 @@
 #include <vector>
 #include <fstream>
 
-#include <GLFW/glfw3.h>
-
 /* 최대 16개의 장치를 지원합니다! */
 #define MAX_DEVICE_SUPPORT_NUMBER 16
 
@@ -32,33 +30,6 @@ const char* outputFileName = "out.ppm";
 
 int main()
 {
-	/*
-	* GLFW를 초기화하고 필요한 익스텐션을 갖고옵니다.
-	*/
-	uint32_t windowWidth = 512;
-	uint32_t windowHeight = 512;
-
-	glfwInit();
-
-	GLFWwindow* theWindow;
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-	theWindow = glfwCreateWindow(windowWidth, windowHeight, "Hello, vulkan!", NULL, NULL);
-
-	uint32_t extensionCount = 0;
-	const char** glfwNeededExtensions = glfwGetRequiredInstanceExtensions(&extensionCount);
-
-	printf("GLFW Need extension: ");
-	for (int i = 0; i < extensionCount; i += 1)
-	{
-		printf("%s", glfwNeededExtensions[i]);
-		printf(" ");
-
-		actived_extensions[i] = glfwNeededExtensions[i];
-	}
-	printf("\n");
-	actived_extensions[extensionCount] = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
-
 	/*
 	* 불칸 인스턴스를 생성합니다.
 	*
@@ -81,7 +52,7 @@ int main()
 		instanceCreateInfo.pApplicationInfo = &applicationInfo;
 		instanceCreateInfo.enabledLayerCount = 1;
 		instanceCreateInfo.ppEnabledLayerNames = actived_layers;
-		instanceCreateInfo.enabledExtensionCount = 1;
+		instanceCreateInfo.enabledExtensionCount = 0;
 		instanceCreateInfo.ppEnabledExtensionNames = actived_extensions;
 
 		VkResult instanceCreateResult = vkCreateInstance(&instanceCreateInfo, NULL, &theVulkan);
@@ -120,13 +91,13 @@ int main()
 
 		for (int i = 0; i < physicalDeviceCount; i += 1)
 		{
-			vkGetPhysicalDeviceProperties(physicalDevices[i], &physicalDeviceProperties);
-
-			printf("Physical Device: %s.", physicalDeviceProperties.deviceName);
-
 			physicalDeviceRatings[i] = 0;
 
+			vkGetPhysicalDeviceProperties(physicalDevices[i], &physicalDeviceProperties);
+
 			physicalDeviceRatings[i] += physicalDeviceProperties.limits.maxImageDimension2D >> 8;
+
+			printf("Physical Device: %s.", physicalDeviceProperties.deviceName);
 
 			printf(" rating: %u\n", physicalDeviceRatings[i]);
 		}
@@ -215,21 +186,6 @@ int main()
 	vkEnumerateDeviceExtensionProperties(physicalDevices[physicalDeviceSelection], NULL, &physicalDeviceUsableExtensionCount, NULL);
 	VkExtensionProperties usableExtensions[512];
 	vkEnumerateDeviceExtensionProperties(physicalDevices[physicalDeviceSelection], NULL, &physicalDeviceUsableExtensionCount, usableExtensions);
-
-	/* 서피스를 만듭니다. */
-	VkSurfaceKHR theSurface;
-	{
-		VkResult surfaceCreation = glfwCreateWindowSurface(theVulkan, theWindow, NULL, &theSurface);
-
-		if (surfaceCreation != VK_SUCCESS)
-		{
-			printf("failed to create surface with error code : % i\n", surfaceCreation);
-		}
-		else
-		{
-			printf("Hello, window surface!\n");
-		}
-	}
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -955,7 +911,7 @@ int main()
 		}
 		vkCmdEndRenderPass(commandBuffer);
 
-		/*
+		
 		VkImageMemoryBarrier imageMemoryBarrierDst;
 		{
 			imageMemoryBarrierDst.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -970,6 +926,7 @@ int main()
 			imageMemoryBarrierDst.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
 		}
 		vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, NULL, 0, NULL, 1, &imageMemoryBarrierDst);
+		
 
 		VkImageMemoryBarrier imageMemoryBarrierSrc;
 		{
@@ -985,7 +942,7 @@ int main()
 			imageMemoryBarrierSrc.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
 		}
 		vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, NULL, 0, NULL, 1, &imageMemoryBarrierSrc);
-
+		
 		VkImageCopy imageCopyRegion;
 		{
 			imageCopyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -1003,7 +960,7 @@ int main()
 			imageCopyRegion.extent.depth = 1;
 		}
 		vkCmdCopyImage(commandBuffer, theImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, readableImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &imageCopyRegion);
-		*/
+		
 	}
 
 	VkResult commandBufferEnding = vkEndCommandBuffer(commandBuffer);
@@ -1067,12 +1024,6 @@ int main()
 	vkWaitForFences(device, 1, &theFence, VK_TRUE, -1);
 
 	printf("\n");
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	while (!glfwWindowShouldClose(theWindow))
-	{
-		glfwPollEvents();
-	}
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1149,9 +1100,7 @@ int main()
 	vkDestroyImageView(device, theImageView, NULL);
 
 	vkDestroyDevice(device, NULL);
-	vkDestroySurfaceKHR(theVulkan, theSurface, NULL);
 	vkDestroyInstance(theVulkan, NULL);
-	glfwDestroyWindow(theWindow);
 
 	return 0;
 }

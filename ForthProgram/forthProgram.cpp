@@ -2,6 +2,7 @@
 #include "vulkanHelper.hpp"
 
 int main() {
+	
 	vkhelp::VulkanHelper vulkanHelper("Hello?");
 
 	auto physicalDevices = vulkanHelper.getPhysicalDevices();
@@ -21,6 +22,5 @@ int main() {
 	}
 
 	vulkanHelper.selectPhysicalDevice(bestDeviceIndex);
-
-
+	
 }

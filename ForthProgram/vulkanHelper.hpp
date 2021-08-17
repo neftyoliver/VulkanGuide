@@ -8,10 +8,22 @@
 
 #include "forthProgram.hpp"
 
+
+
 /* the vulkan helper!
  * using single vulkan instance and using multiple device and queues.
+ * 
+ * logical device will created with pre-
  */
 namespace vkhelp {
+	typedef enum class VkHelperResult {
+		SUCCESS = 0,
+		OUT_OF_INDEX_BOUND = 1,
+		LAYER_UNEXIST = 2,
+		EXTENSION_UNEXIST = 3,
+
+	};
+
 	uint32_t findQueueFamily();
 
 	uint32_t ratePhysicalDevice(vk::PhysicalDevice physicalDevice);
@@ -29,20 +41,22 @@ namespace vkhelp {
         vk::Instance vulkanInstance;
 		std::vector<vk::PhysicalDevice> vecPhysicalDevices;
 		vk::PhysicalDevice selectedDevice;
+
 		std::vector<vk::Device> vecDevices;
 		std::vector<vk::Queue> vecQueues;
 
-		int addLayer(const char * paramLayerName);
-		int addExtension(const char* paramExtensionName);
+		VkHelperResult addLayer(const char * paramLayerName);
+		VkHelperResult addExtension(const char* paramExtensionName);
 
 	public:
 		VulkanHelper(const char* programName);
 		
 		std::vector<vk::PhysicalDevice> getPhysicalDevices();
-		int selectPhysicalDevice(uint32_t index);
+		VkHelperResult selectPhysicalDevice(uint32_t index);
 		vk::PhysicalDevice getSelectedPhysicalDevice();
 
-		//TODO: 큐와 로지컬 디바이스 헨들링
+
+		//TODO: 큐와 로지컬 디바이스 
 
 		~VulkanHelper();
 	};
