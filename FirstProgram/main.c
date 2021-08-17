@@ -1,6 +1,6 @@
  
 /* 
-* Copyright. 2021 네프티 WTFPL
+* Copyright. 2021 네프티 MIT.
 * 
 * 불칸을 소개하고 설명하는 프로젝트입니다.
 */
@@ -12,7 +12,7 @@
 #include <vulkan/vulkan.h>
 
 /* 최대 16개의 장치를 지원합니다! */
-#define MAX_DEVICE_SUPPORT_NUMBER 16
+#define MAX_DEVICE_SUPPORT_NUMBER 8
 
 int main()
 {
